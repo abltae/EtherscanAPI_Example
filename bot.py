@@ -1,17 +1,15 @@
-import discord
+import discord,requests,json
 from flask import endless_ping
-import requests
-import json
+
 
 client = discord.Client() #Discord Client ID
-eth_addy = ["#input your eth address here"] #Eth Address 
-
+ 
 @client.event
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
 
 def get_balance(): #etherscan API to get amount of eth in wallet
-	loadethjson = requests.get("https://api.etherscan.io/api?module=account&action=balance&address=" + str(eth_addy[0]) + "&tag=latest&apikey= (#Your etherscan API key) ")
+	loadethjson = requests.get("https://api.etherscan.io/api?module=account&action=balance&address=" + str(command_value[1]) + "&tag=latest&apikey= (#Your etherscan API key) ")
 	json_data = json.loads(loadethjson.text)
 	purest_value = json_data['result']
 	pure_value = int(purest_value)
@@ -21,19 +19,13 @@ def get_balance(): #etherscan API to get amount of eth in wallet
 
 @client.event
 async def on_message(message):
-	if message.content.startswith('%btc'):
-		await message.channel.send("https://alternative.me/crypto/fear-and-greed-index.png")
-
-	if message.content.startswith('%eth'):
-		await message.channel.send("https://fear-and-greed-indexes.vercel.app/api/eth.png")
+	global command_value
 	if message.content.startswith("%balance"):
+		retrieveaddy = message.content
+		command_value = retrieveaddy.split(" ")
 		embedVar = discord.Embed(title="Balance: " + get_balance(), color=0x00ff00)
 		await message.channel.send(embed=embedVar)
-	# if message.content.startswith("%Change Address"): #(gets this as the message content when it should be the address  you inputed)
-	# 	await message.channel.send("What do you want your new address to be?:")
-	# 	# new_addy = message.content
-	# 	# eth_addy.append(new_addy)
-	# 	# eth_addy.remove(eth_addy[0])
+
 
 endless_ping()
 client.run('#Your Discord Client ID')
